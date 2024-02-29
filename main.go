@@ -1,41 +1,30 @@
+/*
+Copyright © 2024 NAME HERE <EMAIL ADDRESS>
+*/
 package main
 
 import (
 	"context"
 	"fmt"
 	"log"
-	"os"
 
 	"github.com/n1cholasdunn/tasks_cli/auth"
-	"golang.org/x/oauth2/google"
-	"google.golang.org/api/option"
+	"github.com/n1cholasdunn/tasks_cli/forms"
 	"google.golang.org/api/tasks/v1"
 )
 
 func main() {
 	ctx := context.Background()
-	b, err := os.ReadFile("credentials.json")
-	if err != nil {
-		log.Fatalf("Unable to read client secret file: %v", err)
-	}
 
-	// If modifying these scopes, delete your previously saved token.json.
-	config, err := google.ConfigFromJSON(b, tasks.TasksReadonlyScope)
+	srv, err := auth.NewTasksService(ctx, "credentials.json", tasks.TasksReadonlyScope)
 	if err != nil {
-		log.Fatalf("Unable to parse client secret file to config: %v", err)
-	}
-	client := auth.GetClient(config)
-
-	srv, err := tasks.NewService(ctx, option.WithHTTPClient(client))
-	if err != nil {
-		log.Fatalf("Unable to retrieve tasks Client %v", err)
+		log.Fatalf("Error initializing Google Tasks service: %v", err)
 	}
 
 	r, err := srv.Tasklists.List().MaxResults(10).Do()
 	if err != nil {
-		log.Fatalf("Unable to retrieve task lists. %v", err)
+		log.Fatalf("Unable to retrieve task lists: %v", err)
 	}
-
 	fmt.Println("Task Lists:")
 	if len(r.Items) > 0 {
 		for _, taskList := range r.Items {
@@ -60,4 +49,7 @@ func main() {
 	} else {
 		fmt.Print("No task lists found.")
 	}
+
+	forms.Form()
+	// cmd.Execute()
 }

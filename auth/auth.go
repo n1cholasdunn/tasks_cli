@@ -9,6 +9,9 @@ import (
 	"os"
 
 	"golang.org/x/oauth2"
+	"golang.org/x/oauth2/google"
+	"google.golang.org/api/option"
+	"google.golang.org/api/tasks/v1"
 )
 
 // Retrieve a token, saves the token, then returns the generated client.
@@ -64,4 +67,28 @@ func saveToken(path string, token *oauth2.Token) {
 	}
 	defer f.Close()
 	json.NewEncoder(f).Encode(token)
+}
+
+func NewTasksService(ctx context.Context, credentialsFilePath string, scope string) (*tasks.Service, error) {
+	b, err := os.ReadFile(credentialsFilePath)
+	if err != nil {
+		log.Fatalf("Unable to read client secret file: %v", err)
+		return nil, err
+	}
+
+	config, err := google.ConfigFromJSON(b, scope)
+	if err != nil {
+		log.Fatalf("Unable to parse client secret file to config: %v", err)
+		return nil, err
+	}
+
+	client := GetClient(config)
+
+	srv, err := tasks.NewService(ctx, option.WithHTTPClient(client))
+	if err != nil {
+		log.Fatalf("Unable to retrieve tasks Client %v", err)
+		return nil, err
+	}
+
+	return srv, nil
 }
