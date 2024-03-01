@@ -1,16 +1,15 @@
-package tasks
+package data
 
 import (
 	"context"
 	"log"
-	"net/http"
 
-	"google.golang.org/api/option"
+	"github.com/n1cholasdunn/tasks_cli/auth"
 	"google.golang.org/api/tasks/v1"
 )
 
-func CreateTask(ctx context.Context, client *http.Client, tasklistID string, title string) (*tasks.Task, error) {
-	srv, err := tasks.NewService(ctx, option.WithHTTPClient(client))
+func CreateTask(ctx context.Context, tasklistID string, title string) (*tasks.Task, error) {
+	srv, err := auth.NewTasksService(ctx, "credentials.json", tasks.TasksScope)
 	if err != nil {
 		log.Fatalf("Unable to retrieve tasks Client %v", err)
 		return nil, err
@@ -20,7 +19,6 @@ func CreateTask(ctx context.Context, client *http.Client, tasklistID string, tit
 		Title: title,
 	}
 
-	// Create the task in the specified task list
 	task, err := srv.Tasks.Insert(tasklistID, newTask).Do()
 	if err != nil {
 		log.Printf("Unable to create task: %v", err)

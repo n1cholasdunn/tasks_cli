@@ -14,7 +14,7 @@ func SelectTask(ctx context.Context, taskListId string) (string, error) {
 	var selectedTask string
 	var options []huh.Option[string]
 
-	srv, err := auth.NewTasksService(ctx, "credentials.json", tasks.TasksReadonlyScope)
+	srv, err := auth.NewTasksService(ctx, "credentials.json", tasks.TasksScope)
 	if err != nil {
 		log.Fatalf("Error initializing Google Tasks service: %v", err)
 	}

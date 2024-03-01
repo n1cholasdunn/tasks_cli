@@ -7,17 +7,21 @@ import (
 	"context"
 	"log"
 
+	"github.com/n1cholasdunn/tasks_cli/data"
 	"github.com/n1cholasdunn/tasks_cli/forms"
 )
 
 func main() {
 	ctx := context.Background()
 
-	selectTaskId, err := forms.SelectTaskList(ctx)
+	selectedTaskListId, err := forms.SelectTaskList(ctx)
 	if err != nil {
 		log.Fatalf("Error selecting task list: %v", err)
 	}
-	selectedTask, err := forms.SelectTask(ctx, selectTaskId)
+
+	data.CreateTask(ctx, selectedTaskListId, "Tifa Task")
+
+	selectedTask, err := forms.SelectTask(ctx, selectedTaskListId)
 	if err != nil {
 		log.Fatalf("Error selecting task: %v", err)
 	}
