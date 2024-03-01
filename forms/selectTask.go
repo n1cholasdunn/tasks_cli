@@ -2,7 +2,6 @@ package forms
 
 import (
 	"context"
-	"fmt"
 	"log"
 
 	"github.com/charmbracelet/huh"
@@ -11,8 +10,8 @@ import (
 	"google.golang.org/api/tasks/v1"
 )
 
-func SelectTaskList(ctx context.Context) (string, error) {
-	var selectedTaskList string
+func SelectTask(ctx context.Context, taskListId string) (string, error) {
+	var selectedTask string
 	var options []huh.Option[string]
 
 	srv, err := auth.NewTasksService(ctx, "credentials.json", tasks.TasksReadonlyScope)
@@ -20,27 +19,27 @@ func SelectTaskList(ctx context.Context) (string, error) {
 		log.Fatalf("Error initializing Google Tasks service: %v", err)
 	}
 
-	taskLists, err := data.FetchTaskLists(srv)
+	taskList, err := data.FetchTasks(srv, taskListId)
 	if err != nil {
-		log.Fatalf("Error fetching task lists: %v", err)
+		log.Fatalf("Error fetching task list: %v", err)
 	}
 
-	for _, taskList := range taskLists {
-		option := huh.NewOption(taskList.Title, taskList.Id)
+	for _, task := range taskList {
+		option := huh.NewOption(task.Title, task.Id)
 		options = append(options, option)
 	}
 
 	form := huh.NewForm(
 		huh.NewGroup(
 			huh.NewSelect[string]().
-				Title("What task list do you want to modify?").
+				Title("What task do you want to modify?").
 				Options(options...).
-				Value(&selectedTaskList),
+				Value(&selectedTask),
 		)).WithTheme(huh.ThemeCatppuccin())
 
 	err = form.Run()
 	if err != nil {
-		return "", fmt.Errorf("error running form: %v", err)
+		return "", err
 	}
-	return selectedTaskList, nil
+	return selectedTask, nil
 }
