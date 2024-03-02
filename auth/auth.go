@@ -32,8 +32,9 @@ func GetClient(config *oauth2.Config) *http.Client {
 func getTokenFromWeb(config *oauth2.Config) *oauth2.Token {
 	authURL := config.AuthCodeURL("state-token", oauth2.AccessTypeOffline)
 	fmt.Printf("Go to the following link in your browser then type the "+
-		"authorization code: \n%v\n", authURL)
+		"authorization code: \n%v\n \n", authURL)
 
+	fmt.Println("Enter the authorization code here:")
 	var authCode string
 	if _, err := fmt.Scan(&authCode); err != nil {
 		log.Fatalf("Unable to read authorization code: %v", err)

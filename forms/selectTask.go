@@ -23,6 +23,7 @@ func SelectTask(ctx context.Context, taskListId string) (string, error) {
 	if err != nil {
 		log.Fatalf("Error fetching task list: %v", err)
 	}
+	itemCount := len(taskList)
 
 	for _, task := range taskList {
 		option := huh.NewOption(task.Title, task.Id)
@@ -32,10 +33,9 @@ func SelectTask(ctx context.Context, taskListId string) (string, error) {
 	form := huh.NewForm(
 		huh.NewGroup(
 			huh.NewSelect[string]().
-				Title("What task do you want to modify?").
-				Options(options...).
+				Title("What task do you want to modify?").Options(options...).Height(itemCount * 2).
 				Value(&selectedTask),
-		)).WithTheme(huh.ThemeCatppuccin())
+		))
 
 	err = form.Run()
 	if err != nil {
