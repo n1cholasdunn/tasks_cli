@@ -59,7 +59,13 @@ func main() {
 		if err != nil {
 			log.Fatalf("Error selecting task: %v", err)
 		}
-		data.DeleteTask(ctx, selectedTaskListId, selectedTaskId)
+		deleteConfirmed, err := forms.ConfirmDeleteForm()
+		if err != nil {
+			log.Fatalf("Error confirming delete: %v", err)
+		}
+		if deleteConfirmed {
+			data.DeleteTask(ctx, selectedTaskListId, selectedTaskId)
+		}
 		fmt.Printf("Task %s deleted\n", selectedTaskId)
 	case "list":
 		_, err := forms.SelectTask(ctx, selectedTaskListId)
