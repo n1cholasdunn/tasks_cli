@@ -51,8 +51,15 @@ func main() {
 		if err != nil {
 			log.Fatalf("Unable to read title: %v", err)
 		}
-		data.PatchTask(ctx, selectedTaskListId, selectedTaskId, title)
-		fmt.Printf("Task %s updated\n", selectedTaskId)
+
+		editConfirmed, err := forms.ConfirmEditForm()
+		if err != nil {
+			log.Fatalf("Error confirming edit: %v", err)
+		}
+		if editConfirmed {
+			data.PatchTask(ctx, selectedTaskListId, selectedTaskId, title)
+			fmt.Printf("Task %s updated\n", selectedTaskId)
+		}
 
 	case "delete":
 		selectedTaskId, err := forms.SelectTask(ctx, selectedTaskListId)
@@ -65,8 +72,8 @@ func main() {
 		}
 		if deleteConfirmed {
 			data.DeleteTask(ctx, selectedTaskListId, selectedTaskId)
+			fmt.Printf("Task %s deleted\n", selectedTaskId)
 		}
-		fmt.Printf("Task %s deleted\n", selectedTaskId)
 	case "list":
 		_, err := forms.SelectTask(ctx, selectedTaskListId)
 		if err != nil {
