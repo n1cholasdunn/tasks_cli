@@ -8,7 +8,7 @@ import (
 	"google.golang.org/api/tasks/v1"
 )
 
-func CreateTask(ctx context.Context, tasklistID string, title string) (*tasks.Task, error) {
+func CreateTask(ctx context.Context, tasklistID string, title string, notes string, dueDate string) (*tasks.Task, error) {
 	srv, err := auth.NewTasksService(ctx, "credentials.json", tasks.TasksScope)
 	if err != nil {
 		log.Fatalf("Unable to retrieve tasks Client %v", err)
@@ -17,6 +17,8 @@ func CreateTask(ctx context.Context, tasklistID string, title string) (*tasks.Ta
 
 	newTask := &tasks.Task{
 		Title: title,
+		Notes: notes,
+		Due:   dueDate,
 	}
 
 	task, err := srv.Tasks.Insert(tasklistID, newTask).Do()

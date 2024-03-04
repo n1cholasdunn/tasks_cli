@@ -1,12 +1,9 @@
 package main
 
 import (
-	"bufio"
 	"context"
 	"fmt"
 	"log"
-	"os"
-	"strings"
 
 	"github.com/n1cholasdunn/tasks_cli/data"
 	"github.com/n1cholasdunn/tasks_cli/forms"
@@ -27,29 +24,23 @@ func main() {
 
 	switch operation {
 	case "add":
-		fmt.Println("Enter the task title here:")
-
-		reader := bufio.NewReader(os.Stdin)
-
-		title, err := reader.ReadString('\n')
-		title = strings.TrimSpace(title)
+		title, notes, dueDate, err := forms.AddTaskForm()
 		if err != nil {
-			log.Fatalf("Unable to read title: %v", err)
+			log.Fatalf("Unable to complete add task form: %v", err)
 		}
 
-		data.CreateTask(ctx, selectedTaskListId, title)
+		data.CreateTask(ctx, selectedTaskListId, title, notes, dueDate)
 
 	case "update":
+		// slice of task ids to
+		// var taskQueue []string
 		selectedTaskId, err := forms.SelectTask(ctx, selectedTaskListId)
 		if err != nil {
 			log.Fatalf("Error selecting task: %v", err)
 		}
-		fmt.Println("Enter the new task title here:")
-		reader := bufio.NewReader(os.Stdin)
-		title, err := reader.ReadString('\n')
-		title = strings.TrimSpace(title)
+		editedFields, err := forms.EditTaskForm()
 		if err != nil {
-			log.Fatalf("Unable to read title: %v", err)
+			log.Fatalf("Error getting edited fields from form: %v", err)
 		}
 
 		editConfirmed, err := forms.ConfirmEditForm()
@@ -57,7 +48,7 @@ func main() {
 			log.Fatalf("Error confirming edit: %v", err)
 		}
 		if editConfirmed {
-			data.PatchTask(ctx, selectedTaskListId, selectedTaskId, title)
+			data.PatchTask(ctx, selectedTaskListId, selectedTaskId, editedFields["title"], editedFields["notes"], editedFields["due"])
 			fmt.Printf("Task %s updated\n", selectedTaskId)
 		}
 
@@ -80,6 +71,15 @@ func main() {
 			log.Fatalf("Error selecting task: %v", err)
 		}
 
+	case "mark":
+		tasksToMark, err := forms.MutliselectTaskList(ctx, selectedTaskListId)
+		if err != nil {
+			log.Fatalf("Error selecting task: %v", err)
+		}
+		for _, taskId := range tasksToMark {
+			data.MarkTask(ctx, selectedTaskListId, taskId)
+			fmt.Printf("Task %s marked\n", taskId)
+		}
 	}
 	// cmd.Execute()
 }

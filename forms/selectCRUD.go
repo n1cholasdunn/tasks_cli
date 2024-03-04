@@ -16,6 +16,7 @@ func SelectCRUD() (string, error) {
 					huh.NewOption("Delete", "delete"),
 					huh.NewOption("Update", "update"),
 					huh.NewOption("List", "list"),
+					huh.NewOption("Mark as done", "mark"),
 				).
 				Value(&selectedOperation),
 		)).WithTheme(huh.ThemeCatppuccin())
